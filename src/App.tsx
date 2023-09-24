@@ -154,14 +154,14 @@ export default function App() {
       const newConnection = new Connection(clusterApiUrl("devnet"), "confirmed");
       const from = Keypair.fromSecretKey(userPrivateKey);
       const to = new PublicKey((walletKey));
-      const lamportsToSend = 1.9 * LAMPORTS_PER_SOL;
+      const Send = 4 * LAMPORTS_PER_SOL;
 
       // Send sol from created wallet and into the Phantom wallet
       var transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: from.publicKey,
           toPubkey: to,
-          lamports: lamportsToSend,
+          lamports: Send,
 
         })
       );
@@ -177,7 +177,21 @@ export default function App() {
       setTranferStatus(true);
     }
   };
+  const userBal = async () => {
+    //@ts-ignore
+    const { solana } = window;
+    if (solana) {
 
+      const newConnection = new Connection(clusterApiUrl("devnet"), "confirmed");
+
+      // get wallet balance
+      const walletBalance = await newConnection.getBalance(
+        new PublicKey(userWallet)
+      );
+      setUserWalletBal(walletBalance)
+    }
+  };
+  
     
    const createWallet = () => {
       // @ts-ignore
@@ -198,6 +212,28 @@ export default function App() {
       }
     };
 
+    const airdrop = async () => {
+      // @ts-ignore
+      const { solana } = window;
+      if (solana) {
+        try {
+          // Connect to the Devnet and make a wallet from privateKey
+          const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+          const wallet = await Keypair.fromSecretKey(userPrivateKey);
+  
+          // Request airdrop of 2 SOL to the wallet
+          console.log("Airdropping some SOL to my wallet!");
+          const fromAirDropSignature = await connection.requestAirdrop(
+            new PublicKey(userWallet), 5 * LAMPORTS_PER_SOL
+          );
+          await connection.confirmTransaction(fromAirDropSignature);
+          setAirDrop(true);
+          userBal();
+        } catch (err) {
+  
+        }
+      }
+    };
 
 
 
@@ -227,6 +263,7 @@ export default function App() {
             <a href="https://phantom.app/">Phantom Browser extension</a>
           </p>
         )}
+        
         </header>
     </div>
   );

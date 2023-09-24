@@ -14,6 +14,8 @@ import {
 } from "@solana/web3.js";
 import {useEffect , useState } from "react";
 import './App.css'
+import * as buffer from "buffer";
+window.Buffer = buffer.Buffer;
 
 // create types
 type DisplayEncoding = "utf8" | "hex";
@@ -212,7 +214,7 @@ export default function App() {
       }
     };
 
-    const airdrop = async () => {
+    const requestAirdrop = async () => {
       // @ts-ignore
       const { solana } = window;
       if (solana) {
@@ -230,7 +232,7 @@ export default function App() {
           setAirDrop(true);
           userBal();
         } catch (err) {
-  
+          console.log(err)
         }
       }
     };
@@ -240,31 +242,59 @@ export default function App() {
 	// HTML code for the app
   return (
     <div className="App">
-      <header className="App-header">
-        <h2>Connect to Phantom Wallet</h2>
+    <header className="App-header">
+      <h2>Connect to Phantom Wallet</h2>
       {provider && !walletKey && (
-      <button
-        style={{
-          fontSize: "16px",
-          padding: "15px",
-          fontWeight: "bold",
-          borderRadius: "5px",
-        }}
-        onClick={connectWallet}
-      >
-        Connect Wallet
-      </button>
-        )}
-        {provider && walletKey && <p>Connected account</p> }
+        <button className="button" onClick={connectWallet}>
+          Connect Wallet
+        </button>
+      )}
+      {provider && walletKey && (
+        <div>
+          <p className="connected-account">Connected account: {userWallet}</p>
+          <button onClick={disconnectWallet} className="button">
+            Disconnect Wallet
+          </button>
+        </div>
+      )}
+      {!provider && (
+        <p>
+          No provider found. Install{' '}
+          <a href="https://phantom.app/">Phantom Browser extension</a>
+        </p>
+      )}
 
-        {!provider && (
-          <p>
-            No provider found. Install{" "}
-            <a href="https://phantom.app/">Phantom Browser extension</a>
-          </p>
-        )}
-        
-        </header>
-    </div>
-  );
-}
+      {walletKey && (
+        <div>
+          <h3>Wallet Actions:</h3>
+          <button onClick={userBal} className="button">
+         { walletBal && `${parseInt(walletBal) / LAMPORTS_PER_SOL} SOL` } 
+         Get Wallet Balance
+          </button>
+          <button onClick={transferSol} className="button">
+            Transfer SOL
+          </button>
+        </div>
+      )}
+
+      {!userWallet && (
+        <div>
+          <h3>Create Wallet:</h3>
+          <button onClick={createWallet} className="button">
+            Create New Wallet
+          </button>
+        </div>
+      )}
+
+      {!airDrop && (
+        <div>
+          <h3>Airdrop:</h3>
+          <button onClick={requestAirdrop} className="button">
+            Request Airdrop
+          </button>
+        </div>
+      )}
+    </header>
+  </div>
+);
+};

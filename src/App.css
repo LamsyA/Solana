@@ -36,3 +36,60 @@
     transform: rotate(360deg);
   }
 }
+
+/* App.css */
+
+/* Style for the header */
+.App-header {
+  background-color: #998a71;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Style for the h2 */
+.App-header h2 {
+  font-size: 24px;
+}
+
+/* Style for buttons */
+button {
+  background-color: #52d70f;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2f9c3d;
+}
+
+/* Style for links */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Style for the main container */
+.App {
+  text-align: center;
+}
+
+/* Style for the connected account */
+.connected-account {
+  font-weight: bold;
+}
+
+/* Style for the headings */
+h3 {
+  font-size: 20px;
+  margin-top: 20px;
+}

@@ -5,6 +5,12 @@ import './App.css';
 import {
   PublicKey,
   Transaction,
+  sendAndConfirmTransaction,
+  SystemProgram,
+  Keypair,
+  Connection,
+  clusterApiUrl,
+  LAMPORTS_PER_SOL
 } from "@solana/web3.js";
 import {useEffect , useState } from "react";
 import './App.css'
@@ -71,6 +77,28 @@ export default function App() {
 	  else setProvider(undefined);
   }, []);
 
+  //  state variable that keep track of the balance of wallet
+  const [walletBal, setWalletBal] = useState<any | undefined>(
+    undefined
+  );
+
+  // state variable that store the created wallet
+  const [userWallet, setUserWallet] = useState<any | undefined>(undefined);
+
+   // state variable that track the status of airdrop
+   const [transferStatus, setTranferStatus] = useState<boolean>(
+    false
+  );
+
+
+    // create a state variable to store balance of created wallet
+    const [userWalletBal, setUserWalletBal] = useState<any | undefined>(undefined);
+
+    // cstate variable to track the status of airdrop
+    const [airDrop, setAirDrop] = useState<boolean>(
+      false
+    );
+
   /**
    * @description prompts user to connect wallet if it exists.
 	 * This function is called when the connect wallet button is clicked
@@ -87,11 +115,91 @@ export default function App() {
         console.log('wallet account ', response.publicKey.toString());
 				// update walletKey to be the public key
         setWalletKey(response.publicKey.toString());
+
+        const newConnection = new Connection(clusterApiUrl("devnet"), "confirmed");
+         // get wallet balance
+         const getWalletBalance = await newConnection.getBalance(
+          new PublicKey(response.publicKey.toString())
+        );
+
+        // set wallet balance
+        setWalletBal(getWalletBalance);
       } catch (err) {
-      // { code: 4001, message: 'User rejected the request.' }
+        throw new Error("User rejected the request");
       }
     }
   };
+
+  const disconnectWallet = async () => {
+    // @ts-ignore
+    const { solana } = window;
+    if (solana) {
+      try {
+        await solana.disconnect();
+        setWalletKey(undefined);
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  };
+
+
+        // create a state variable to store the private key
+        const [userPrivateKey, setUserPrivateKey] = useState<any | undefined>(undefined);
+ 
+
+  const transferSol = async () => {
+    if (walletKey) {
+      // Connect to the Devnet and make a wallet from privateKey
+      const newConnection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      const from = Keypair.fromSecretKey(userPrivateKey);
+      const to = new PublicKey((walletKey));
+      const lamportsToSend = 1.9 * LAMPORTS_PER_SOL;
+
+      // Send sol from created wallet and into the Phantom wallet
+      var transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: from.publicKey,
+          toPubkey: to,
+          lamports: lamportsToSend,
+
+        })
+      );
+
+      // Sign transaction
+      var signature = await sendAndConfirmTransaction(newConnection, transaction, [
+        from,
+      ]);
+      const senderBalanceAfter = await newConnection.getBalance(from.publicKey);
+      setUserWalletBal(senderBalanceAfter);
+      const receiverBalanceAfter = await newConnection.getBalance(to);
+      setWalletBal(receiverBalanceAfter);
+      setTranferStatus(true);
+    }
+  };
+
+    
+   const createWallet = () => {
+      // @ts-ignore
+      const { solana } = window;
+      if (solana) {
+        try {
+          // Create connection to the Devnet
+          const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+          const newPair = new Keypair();
+          const publicKey = new PublicKey(newPair.publicKey).toString();
+          const privateKey = newPair.secretKey;
+  
+          setUserWallet(publicKey);
+          setUserPrivateKey(privateKey);
+        } catch (err) {
+  
+        }
+      }
+    };
+
+
+
 
 	// HTML code for the app
   return (

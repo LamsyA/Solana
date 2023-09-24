@@ -156,7 +156,7 @@ export default function App() {
       const newConnection = new Connection(clusterApiUrl("devnet"), "confirmed");
       const from = Keypair.fromSecretKey(userPrivateKey);
       const to = new PublicKey((walletKey));
-      const Send = 4 * LAMPORTS_PER_SOL;
+      const Send = 1 * LAMPORTS_PER_SOL;
 
       // Send sol from created wallet and into the Phantom wallet
       var transaction = new Transaction().add(
@@ -226,7 +226,7 @@ export default function App() {
           // Request airdrop of 2 SOL to the wallet
           console.log("Airdropping some SOL to my wallet!");
           const fromAirDropSignature = await connection.requestAirdrop(
-            new PublicKey(userWallet), 5 * LAMPORTS_PER_SOL
+            new PublicKey(userWallet), 2 * LAMPORTS_PER_SOL
           );
           await connection.confirmTransaction(fromAirDropSignature);
           setAirDrop(true);
@@ -268,8 +268,8 @@ export default function App() {
         <div>
           <h3>Wallet Actions:</h3>
           <button onClick={userBal} className="button">
-         { walletBal && `${parseInt(walletBal) / LAMPORTS_PER_SOL} SOL` } 
-         Get Wallet Balance
+         { walletBal && `${parseInt(walletBal) / LAMPORTS_PER_SOL} SOL ` } {" "}
+         Balance
           </button>
           <button onClick={transferSol} className="button">
             Transfer SOL
